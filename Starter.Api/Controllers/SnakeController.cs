@@ -19,15 +19,15 @@ namespace Starter.Api.Controllers
         [HttpGet("")]
         public IActionResult Index()
         {
-            Console.WriteLine("Ping!");
+            Console.WriteLine("Pong!");
 
             var response = new InitResponse
             {
                 ApiVersion = "1",
                 Author = "",
                 Color = "#0B8C00",
-                Head = "default",
-                Tail = "default"
+                Head = "caffeine",
+                Tail = "bolt"
             };
 
             return Ok(response);
@@ -42,7 +42,7 @@ namespace Starter.Api.Controllers
         [HttpPost("start")]
         public IActionResult Start(GameStatusRequest gameStatusRequest)
         {
-            Console.WriteLine("Setting up!");            
+            Console.WriteLine("Setting up!");
 
             return Ok();
         }
@@ -56,32 +56,32 @@ namespace Starter.Api.Controllers
         [HttpPost("move")]
         public IActionResult Move(GameStatusRequest gameStatusRequest)
         {
-            Dictionary<Point, string> m_dicDirectionToName = new Dictionary<Point, string>();
-
-            m_dicDirectionToName.Add(new Point(0, 1), "up");
-            m_dicDirectionToName.Add(new Point(0, -1), "down");
-            m_dicDirectionToName.Add(new Point(1, 0), "right");
-            m_dicDirectionToName.Add(new Point(-1, 0), "left");
-
-            var rng = new Random();
-
             Snake me = gameStatusRequest.You;
 
             Board gameBoard = gameStatusRequest.Board;
 
-            string direction = FindNextDirection(me, gameBoard, m_dicDirectionToName);            
+            string direction = FindNextDirection(me, gameBoard);
+
+            Console.WriteLine(gameStatusRequest.Turn);
 
             var response = new MoveResponse
             {
-                Move = direction,
+                Move = "right",
                 Shout = "I am moving!"
             };
             return Ok(response);
         }
 
 
-        private string FindNextDirection(Snake me, Board gameBoard, Dictionary<Point, string> possibleMovements)
+        private string FindNextDirection(Snake me, Board gameBoard)
         {
+            Dictionary<Point, string> possibleMovements = new Dictionary<Point, string>();
+
+            possibleMovements.Add(new Point(0, 1), "up");
+            possibleMovements.Add(new Point(0, -1), "down");
+            possibleMovements.Add(new Point(1, 0), "right");
+            possibleMovements.Add(new Point(-1, 0), "left");
+
             BoardRepresentation boardInfo = new BoardRepresentation(gameBoard);
 
             Console.WriteLine(boardInfo.ToString());
@@ -93,7 +93,7 @@ namespace Starter.Api.Controllers
             var direction = new List<string> { "down", "left", "right", "up" };
 
             string ret = direction[rng.Next(direction.Count)];
-            
+
             Console.WriteLine("Moving!");
 
             foreach (KeyValuePair<Point, string> kvp in possibleMovements)
@@ -122,7 +122,7 @@ namespace Starter.Api.Controllers
                 }
             }
 
-            if(direction.Count > 0)
+            if (direction.Count > 0)
                 ret = direction[rng.Next(direction.Count)];
 
             return ret;
