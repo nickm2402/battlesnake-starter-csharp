@@ -101,7 +101,7 @@ namespace Starter.Api.Controllers
             foreach (KeyValuePair<Point, string> kvp in possibleMovements)
             {
                 currentDirection = kvp.Key;
-                possibleMovePoint = me.Body.FirstOrDefault() + currentDirection;
+                possibleMovePoint = me.Head + currentDirection;
 
                 if (dangerZones.Contains(possibleMovePoint))
                 {
