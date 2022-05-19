@@ -21,7 +21,7 @@ namespace Starter.Api.Controllers
             {
                 ApiVersion = "1",
                 Author = "",
-                Color = "#FFFFFF",
+                Color = "#0B8C00",
                 Head = "default",
                 Tail = "default"
             };
@@ -52,6 +52,10 @@ namespace Starter.Api.Controllers
         {
             var direction = new List<string> {"down", "left", "right", "up"};
             var rng = new Random();
+
+            Snake me = gameStatusRequest.You;
+
+            Board gameBoard = gameStatusRequest.Board; 
 
             var response = new MoveResponse
             {
