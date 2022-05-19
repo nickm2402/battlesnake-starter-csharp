@@ -175,18 +175,10 @@ namespace Starter.Api.Controllers
             //Create danger zone around heads (including the head itself.. might be important if you want to play aggressive later)
             foreach (Point h in heads)
             {
-                for (int x = -1; x <= 1; x++)
-                {
-                    for (int y = -1; y <= 1; y++)
-                    {
-                        if (x == 0 && y == 0)
-                        {
-                            continue;
-                        }
-
-                        ret.Add(h + new Point(x, y));
-                    }
-                }
+                ret.Add(h + new Point(1, 0));
+                ret.Add(h - new Point(1, 0));
+                ret.Add(h + new Point(0, 1));
+                ret.Add(h - new Point(0, 1));
             }
 
             return ret;
