@@ -66,7 +66,7 @@ namespace Starter.Api.Controllers
 
             var response = new MoveResponse
             {
-                Move = "right",
+                Move = direction,
                 Shout = "I am moving!"
             };
             return Ok(response);
