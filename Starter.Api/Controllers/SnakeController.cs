@@ -92,6 +92,8 @@ namespace Starter.Api.Controllers
             var rng = new Random();
             var direction = new List<string> { "down", "left", "right", "up" };
 
+            List<Point> dangerZones = generateDangerZones(gameBoard, me);
+
             string ret = direction[rng.Next(direction.Count)];
 
             Console.WriteLine("Moving!");
@@ -101,8 +103,13 @@ namespace Starter.Api.Controllers
                 currentDirection = kvp.Key;
                 possibleMovePoint = me.Body.FirstOrDefault() + currentDirection;
 
-                EFieldInformation fieldInformation = boardInfo.GetFielInformationForPoint(possibleMovePoint);
+                if (dangerZones.Contains(possibleMovePoint))
+                {
+                    direction.Remove(possibleMovements[currentDirection]);
+                    continue;
+                }
 
+                EFieldInformation fieldInformation = boardInfo.GetFielInformationForPoint(possibleMovePoint);
 
                 switch (fieldInformation)
                 {
@@ -145,6 +152,41 @@ namespace Starter.Api.Controllers
 
             if (direction.Count > 0)
                 ret = direction[rng.Next(direction.Count)];
+
+            return ret;
+        }
+
+        private List<Point> generateDangerZones(Board gameBoard, Snake me)
+        {
+            List<Point> ret = new List<Point>();
+            List<Point> heads = new List<Point>();
+
+            //Save all head points except for your own
+            foreach (Snake s in gameBoard.Snakes)
+            {
+                if (s.Id == me.Id)
+                {
+                    continue;
+                }
+                heads.Add(s.Body.First());
+            }
+
+            //Create danger zone around heads (including the head itself.. might be important if you want to play aggressive later)
+            foreach (Point h in heads)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        if (x == 0 && y == 0)
+                        {
+                            continue;
+                        }
+
+                        ret.Add(h + new Point(x, y));
+                    }
+                }
+            }
 
             return ret;
         }

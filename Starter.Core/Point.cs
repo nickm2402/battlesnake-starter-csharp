@@ -20,5 +20,14 @@
         {
             return new Point(a.X - b.X, a.Y - b.Y);
         }
+
+        public override bool Equals(object obj)
+        {
+            if(obj is Point)
+            {
+                return this.X == (obj as Point).X && this.Y == (obj as Point).Y;
+            }
+            return base.Equals(obj);
+        }
     }
 }
