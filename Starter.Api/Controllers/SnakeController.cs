@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Starter.Api.Requests;
 using Starter.Api.Responses;
 using Starter.Core;
+using BoardInformation;
+using System.Linq;
 
 namespace Starter.Api.Controllers
 {
@@ -17,13 +19,15 @@ namespace Starter.Api.Controllers
         [HttpGet("")]
         public IActionResult Index()
         {
+            Console.WriteLine("Pong!");
+
             var response = new InitResponse
             {
                 ApiVersion = "1",
                 Author = "",
-                Color = "#FFFFFF",
-                Head = "default",
-                Tail = "default"
+                Color = "#0B8C00",
+                Head = "caffeine",
+                Tail = "bolt"
             };
 
             return Ok(response);
@@ -38,6 +42,8 @@ namespace Starter.Api.Controllers
         [HttpPost("start")]
         public IActionResult Start(GameStatusRequest gameStatusRequest)
         {
+            Console.WriteLine("Setting up!");
+
             return Ok();
         }
 
@@ -50,17 +56,77 @@ namespace Starter.Api.Controllers
         [HttpPost("move")]
         public IActionResult Move(GameStatusRequest gameStatusRequest)
         {
-            var direction = new List<string> {"down", "left", "right", "up"};
-            var rng = new Random();
+            Snake me = gameStatusRequest.You;
+
+            Board gameBoard = gameStatusRequest.Board;
+
+            string direction = FindNextDirection(me, gameBoard);
+
+            Console.WriteLine(gameStatusRequest.Turn);
 
             var response = new MoveResponse
             {
-                Move = direction[rng.Next(direction.Count)],
+                Move = direction,
                 Shout = "I am moving!"
             };
             return Ok(response);
         }
 
+
+        private string FindNextDirection(Snake me, Board gameBoard)
+        {
+            Dictionary<Point, string> possibleMovements = new Dictionary<Point, string>();
+
+            possibleMovements.Add(new Point(0, 1), "up");
+            possibleMovements.Add(new Point(0, -1), "down");
+            possibleMovements.Add(new Point(1, 0), "right");
+            possibleMovements.Add(new Point(-1, 0), "left");
+
+            BoardRepresentation boardInfo = new BoardRepresentation(gameBoard);
+
+            Console.WriteLine(boardInfo.ToString());
+
+            Point currentDirection;
+            Point possibleMovePoint;
+
+            var rng = new Random();
+            var direction = new List<string> { "down", "left", "right", "up" };
+
+            string ret = direction[rng.Next(direction.Count)];
+
+            Console.WriteLine("Moving!");
+
+            foreach (KeyValuePair<Point, string> kvp in possibleMovements)
+            {
+                currentDirection = kvp.Key;
+                possibleMovePoint = me.Body.FirstOrDefault() + currentDirection;
+
+                EFieldInformation fieldInformation = boardInfo.GetFielInformationForPoint(possibleMovePoint);
+
+
+                switch (fieldInformation)
+                {
+                    case EFieldInformation.EMPTY:
+                        break;
+
+                    case EFieldInformation.FOOD:
+                        Console.WriteLine("Food!");
+                        return possibleMovements[currentDirection];
+
+                    case EFieldInformation.SNAKE:
+                    case EFieldInformation.HAZARDS:
+                    case EFieldInformation.WALL:
+                    default:
+                        direction.Remove(possibleMovements[currentDirection]);
+                        break;
+                }
+            }
+
+            if (direction.Count > 0)
+                ret = direction[rng.Next(direction.Count)];
+
+            return ret;
+        }
 
         /// <summary>
         /// Your Battlesnake will receive this request whenever a game it was playing has ended.

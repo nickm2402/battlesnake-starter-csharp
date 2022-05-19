@@ -63,7 +63,7 @@ namespace Starter.Core
         /// the Battlesnake timed out and failed to respond.
         /// Example: 450
         /// </summary>
-        public int Latency { get; set; }
+        public string Latency { get; set; }
 
 
         /// <summary>
