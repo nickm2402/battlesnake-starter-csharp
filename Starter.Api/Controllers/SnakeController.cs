@@ -131,7 +131,8 @@ namespace Starter.Api.Controllers
 
             if (gameBoard.Food.Count() > 0)
             {
-                Point targetApple = gameBoard.Food.First();
+                Point targetApple = GetClosestFood(gameBoard.Food, me.Head);
+
                 if (me.Head.X < targetApple.X && direction.Contains("right"))
                 {
                     return "right";
@@ -189,6 +190,32 @@ namespace Starter.Api.Controllers
             }
 
             return ret;
+        }
+
+        private Point GetClosestFood(IEnumerable<Point> food, Point snakeHead)
+        {
+            if(food.Count() == 0)
+            {
+                return new Point(-1, -1);
+            }
+
+            Point headToFood;
+            int shortestDistance = int.MaxValue;
+            Point closestFood = food.First();
+
+            foreach(Point point in food)
+            {                
+                headToFood = point - snakeHead;
+                int currentDistance = Math.Abs(headToFood.X) + Math.Abs(headToFood.Y);
+
+                if(currentDistance < shortestDistance)
+                {
+                    shortestDistance = currentDistance;
+                    closestFood = point;
+                }
+            }
+
+            return closestFood;
         }
 
         /// <summary>
