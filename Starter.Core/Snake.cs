@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+
 
 namespace Starter.Core
 {
@@ -63,6 +65,7 @@ namespace Starter.Core
         /// the Battlesnake timed out and failed to respond.
         /// Example: 450
         /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int Latency { get; set; }
 
 
