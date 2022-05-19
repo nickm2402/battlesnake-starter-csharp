@@ -122,6 +122,27 @@ namespace Starter.Api.Controllers
                 }
             }
 
+            if (gameBoard.Food.Count() > 0)
+            {
+                Point targetApple = gameBoard.Food.First();
+                if (me.Head.X < targetApple.X && direction.Contains("right"))
+                {
+                    return "right";
+                }
+                else if (me.Head.X > targetApple.X && direction.Contains("left"))
+                {
+                    return "left";
+                }
+                else if (me.Head.Y > targetApple.Y && direction.Contains("down"))
+                {
+                    return "down";
+                }
+                else if (me.Head.Y < targetApple.Y && direction.Contains("up"))
+                {
+                    return "up";
+                }
+            }
+
             if (direction.Count > 0)
                 ret = direction[rng.Next(direction.Count)];
 
