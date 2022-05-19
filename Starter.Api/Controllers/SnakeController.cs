@@ -165,7 +165,7 @@ namespace Starter.Api.Controllers
             //Save all head points except for your own
             foreach (Snake s in gameBoard.Snakes)
             {
-                if (s.Id == me.Id)
+                if (s.Id == me.Id || s.Body.Count() < me.Body.Count())
                 {
                     continue;
                 }
@@ -194,7 +194,7 @@ namespace Starter.Api.Controllers
 
         private Point GetClosestFood(IEnumerable<Point> food, Point snakeHead)
         {
-            if(food.Count() == 0)
+            if (food.Count() == 0)
             {
                 return new Point(-1, -1);
             }
@@ -203,12 +203,12 @@ namespace Starter.Api.Controllers
             int shortestDistance = int.MaxValue;
             Point closestFood = food.First();
 
-            foreach(Point point in food)
-            {                
+            foreach (Point point in food)
+            {
                 headToFood = point - snakeHead;
                 int currentDistance = Math.Abs(headToFood.X) + Math.Abs(headToFood.Y);
 
-                if(currentDistance < shortestDistance)
+                if (currentDistance < shortestDistance)
                 {
                     shortestDistance = currentDistance;
                     closestFood = point;
