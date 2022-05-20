@@ -31,6 +31,15 @@ namespace Starter.Core
             return new Point(a.X - b.X, a.Y - b.Y);
         }
 
+        public static bool operator ==(Point a, Point b)
+        {
+            return a.Equals(b);
+        }
+        public static bool operator !=(Point a, Point b)
+        {
+            return !a.Equals(b);
+        }
+
         public override bool Equals(object obj)
         {
             if(obj is Point)
@@ -38,6 +47,16 @@ namespace Starter.Core
                 return this.X == (obj as Point).X && this.Y == (obj as Point).Y;
             }
             return base.Equals(obj);
+        }
+
+        public override string ToString()
+        {
+            return "X: " + X + " Y: " + Y;
+        }
+
+        public override int GetHashCode()
+        {
+            return ToString().GetHashCode();
         }
     }
 }

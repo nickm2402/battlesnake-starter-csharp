@@ -6,6 +6,7 @@ using Starter.Api.Responses;
 using Starter.Core;
 using BoardInformation;
 using System.Linq;
+using Pathfinding;
 
 namespace Starter.Api.Controllers
 {
@@ -131,23 +132,13 @@ namespace Starter.Api.Controllers
 
             if (gameBoard.Food.Count() > 0)
             {
-                Point targetApple = GetClosestFood(gameBoard.Food, me.Head);
+                List<Point> path = GetPathToClosestFood(gameBoard.Food, me.Head, gameBoard);
 
-                if (me.Head.X < targetApple.X && direction.Contains("right"))
+                if(path != null)
                 {
-                    return "right";
-                }
-                else if (me.Head.X > targetApple.X && direction.Contains("left"))
-                {
-                    return "left";
-                }
-                else if (me.Head.Y > targetApple.Y && direction.Contains("down"))
-                {
-                    return "down";
-                }
-                else if (me.Head.Y < targetApple.Y && direction.Contains("up"))
-                {
-                    return "up";
+                    Point dir = path.First() - me.Head;
+
+                    return possibleMovements.GetValueOrDefault(dir);
                 }
             }
 
@@ -184,30 +175,23 @@ namespace Starter.Api.Controllers
             return ret;
         }
 
-        private Point GetClosestFood(IEnumerable<Point> food, Point snakeHead)
+        static private List<Point> GetPathToClosestFood(IEnumerable<Point> food, Point snakeHead, Board gameBoard)
         {
-            if (food.Count() == 0)
+            List<Point> pathToClosestFood = null;
+            int minDist = int.MaxValue;
+
+            foreach (Point target in food)
             {
-                return new Point(-1, -1);
-            }
-
-            Point headToFood;
-            int shortestDistance = int.MaxValue;
-            Point closestFood = food.First();
-
-            foreach (Point point in food)
-            {
-                headToFood = point - snakeHead;
-                int currentDistance = Math.Abs(headToFood.X) + Math.Abs(headToFood.Y);
-
-                if (currentDistance < shortestDistance)
+                Pathfinder pf = new Pathfinder();
+                List<Point> path = pf.FindPath(snakeHead, target, gameBoard);
+                if(path != null && path.Count < minDist)
                 {
-                    shortestDistance = currentDistance;
-                    closestFood = point;
+                    pathToClosestFood = path;
+                    minDist = path.Count;
                 }
             }
 
-            return closestFood;
+            return pathToClosestFood;
         }
 
         /// <summary>

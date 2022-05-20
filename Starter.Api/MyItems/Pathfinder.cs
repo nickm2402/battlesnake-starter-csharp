@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Pathfinder
+namespace Pathfinding
 {
     public class Pathfinder
     {
@@ -20,6 +20,7 @@ namespace Pathfinder
             m_parents = new();
 
             m_fscores.Add(start, start.DistanceTo(target));
+            m_gscores.Add(start, 0);
             open.Add(start);
 
             while (open.Count > 0)
@@ -27,24 +28,34 @@ namespace Pathfinder
                 Point current = BestPoint(open);
                 if (current == target)
                 {
-                    return GetPath(current);
+                    List<Point> path = GetPath(current);
+                    path.RemoveAt(0);
+                    path.Add(target);
+                    return path;
                 }
 
                 open.Remove(current);
 
-                List<Point> directions = new List<Point> { new Point(-1, -1), new Point(-1, 1), new Point(1, -1), new Point(1, 1) };
+                List<Point> directions = new List<Point> { new Point(-1, 0), new Point(1, 0), new Point(0, -1), new Point(0, 1) };
+                Random rand = new Random();
+                directions = directions.OrderBy(x => rand.Next()).ToList();
                 foreach (Point dir in directions)
                 {
                     Point neighbor = current + dir;
-                    int tgscore = GetGScore(current) + current.DistanceTo(neighbor);
-                    if (tgscore > GetGScore(neighbor))
+                    if (!gameBoard.IsWalkable(neighbor))
                     {
-                        m_parents.Add(neighbor, current);
-                        m_gscores.Add(neighbor, tgscore);
-                        m_fscores.Add(neighbor, tgscore + neighbor.DistanceTo(target));
+                        continue;
+                    }
+                    int tgscore = GetGScore(current) + current.DistanceTo(neighbor);
+                    if (tgscore < GetGScore(neighbor))
+                    {
+                        m_parents[neighbor] = current;
+                        m_gscores[neighbor] = tgscore;
+                        m_fscores[neighbor] = tgscore + neighbor.DistanceTo(target);
                         if (!open.Contains(neighbor))
                         {
                             open.Add(neighbor);
+                            Console.WriteLine("added " + neighbor.X + " " + neighbor.Y);
                         }
                     }
                 }
@@ -60,16 +71,15 @@ namespace Pathfinder
             while (m_parents.ContainsKey(current))
             {
                 current = m_parents.GetValueOrDefault(current);
-                path.Prepend(current);
+                path = path.Prepend(current).ToList();
             }
-
             return path;
         }
 
         private Point BestPoint(List<Point> possibles)
         {
             Point minPoint = null;
-            int minScores = int.MaxValue;
+            int minScores = 10000000;
 
             foreach (Point possibility in possibles)
             {
@@ -97,7 +107,7 @@ namespace Pathfinder
             }
             else
             {
-                int d = int.MaxValue;
+                int d = 10000000;
                 m_fscores.Add(p, d);
                 return d;
             }
@@ -111,7 +121,7 @@ namespace Pathfinder
             }
             else
             {
-                int d = int.MaxValue;
+                int d = 10000000;
                 m_gscores.Add(p, d);
                 return d;
             }
