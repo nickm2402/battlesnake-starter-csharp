@@ -134,11 +134,14 @@ namespace Starter.Api.Controllers
             {
                 List<Point> path = GetPathToClosestFood(gameBoard.Food, me.Head, gameBoard);
 
-                if(path != null)
+                if (path != null)
                 {
                     Point dir = path.First() - me.Head;
-
-                    return possibleMovements.GetValueOrDefault(dir);
+                    string dirStr = possibleMovements.GetValueOrDefault(dir);
+                    if (direction.Contains(dirStr))
+                    {
+                        return dirStr;
+                    }
                 }
             }
 
@@ -184,7 +187,7 @@ namespace Starter.Api.Controllers
             {
                 Pathfinder pf = new Pathfinder();
                 List<Point> path = pf.FindPath(snakeHead, target, gameBoard);
-                if(path != null && path.Count < minDist)
+                if (path != null && path.Count < minDist)
                 {
                     pathToClosestFood = path;
                     minDist = path.Count;
