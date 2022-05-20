@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Starter.Core
 {
@@ -44,5 +45,28 @@ namespace Starter.Core
         /// Example: [{"x": 0, "y": 0}, ..., {"x": 0, "y": 1}]
         /// </summary>
         public IEnumerable<Point> Hazards { get; set; }
+
+        public bool IsWalkable(Point p)
+        {
+            if (p.X >= Width || p.X < 0 || p.Y >= Height || p.Y < 0)
+            {
+                return false;
+            }
+
+            foreach (Snake sn in Snakes)
+            {
+                if (sn.Body.Contains(p))
+                {
+                    return false;
+                }
+            }
+
+            if (Hazards.Contains(p))
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

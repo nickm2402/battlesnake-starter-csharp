@@ -1,4 +1,6 @@
-﻿namespace Starter.Core
+﻿using System;
+
+namespace Starter.Core
 {
     public class Point
     {
@@ -9,6 +11,14 @@
         {
             X = x;
             Y = y;
+        }
+
+        public int DistanceTo(Point p)
+        {
+            int dx = this.X - p.X;
+            int dy = this.Y - p.Y;
+
+            return Math.Abs(dx) + Math.Abs(dy);
         }
 
         public static Point operator +(Point a, Point b)
